@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "title": "Game Update 1.2.0 Released",
+    "date": "2023-11-15",
+    "content": "We're excited to announce the release of version 1.2.0! This update includes new quests, improved graphics, and bug fixes.",
+    "image": "https://media-hosting.imagekit.io//a29da47b355c4541/1100x225-download-mmorpg-patch-notes-maplestory-x-isekai-quartetpng-2670441129.jpg?Expires=1835506365&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=wJZ2LGGZg3vEDaE4f9wduJQ351H8a8CqkWvAGy-rk-X1jMrrzFblmcnQZ6QB3DTSdiONkJ2y~o9bG13wc2yJ20hSVsGTICyW8rLT4mQQNmyXxvBtKgiSQ4L-WtX6SFP7Vrs96kGXM7cHEQ3lz~4hWhDqTETz4N9igByMcM4Oaf553DnKjuj0aYzITUk-mIMG9e573AcmaqwmYqsQvafhkcWtqZ5~yo1oonBIHMXumAh9W3KoGhxiN0IBkfe6xS9ACui6arJxPmR92NKRDn4MtBchnzSFpiqo5Pq6RIV3hA4zfXfqWGyGNCI~4kwbFiZw5y2Q4U3QZPJRvs8kNdAFVg__"
+  },
+  {
+    "id": 2,
+    "title": "Weekend Event: Double XP",
+    "date": "2023-11-10",
+    "content": "Join us this weekend for a special double XP event! Log in between Friday and Sunday to earn twice the experience points."
+  },
+  {
+    "id": 3,
+    "title": "Server Maintenance",
+    "date": "2023-11-05",
+    "content": "Servers will be down for maintenance on November 7th from 2AM to 6AM UTC. We apologize for any inconvenience."
+  }
+] 

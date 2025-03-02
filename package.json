@@ -24,6 +24,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
     "axios": "^1.8.1",
+    "dotenv": "^16.4.7",
     "electron-store": "^10.0.1",
     "electron-updater": "^6.3.9",
     "node-stream-zip": "^1.15.0",
