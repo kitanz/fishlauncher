@@ -6,10 +6,10 @@ A modern, sleek game launcher built with Electron, Vue, and TypeScript. Fish Lau
 
 ## Features
 
-- **Game Management**: Set your game directory and launch games with a single click
+- **Game Management**: Set your game directory
 - **Automatic Updates**: Check for and download game updates automatically
 - **News Feed**: Stay up-to-date with the latest game news and announcements
-- **Modern UI**: Clean, responsive interface with dark mode support
+- **Modern UI**: Clean, responsive interface
 - **Cross-Platform**: Works on Windows, macOS, and Linux
 
 ## Installation
