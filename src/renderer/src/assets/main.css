@@ -1,4 +1,4 @@
-/* @import './base.css';
+@import './base.css';
 
 body {
   display: flex;
@@ -65,4 +65,4 @@ code {
   .versions {
     display: none;
   }
-} */
+}
