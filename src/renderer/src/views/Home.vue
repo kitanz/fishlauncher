@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useLogStore } from '../stores/logStore'
+import { useNotification } from '@kyvg/vue3-notification'
 
 // Define types locally since we can't import them
 interface UpdateInfo {
@@ -32,6 +34,9 @@ const isLoadingNews = ref(false)
 const downloadProgress = ref(0)
 const showProgress = ref(false)
 
+const logStore = useLogStore()
+const { notify } = useNotification()
+
 onMounted(async () => {
   // Load game directory
   gameDirectory.value = await window.api.getGameDirectory()
@@ -50,12 +55,17 @@ async function checkForUpdates(): Promise<void> {
   try {
     // Get current game version
     if (gameDirectory.value) {
-      // Use a try-catch block for getGameVersion since it might not be defined in the API
       try {
         gameVersion.value = await window.api.getGameVersion(gameDirectory.value)
       } catch (error) {
         console.error('Error getting game version:', error)
         gameVersion.value = '0.0.0'
+        logStore.addLog('warning', 'Could not determine game version', error instanceof Error ? error.message : String(error))
+        notify({
+          type: 'warn',
+          title: 'Warning',
+          text: 'Could not determine game version'
+        })
       }
     }
     
@@ -68,10 +78,25 @@ async function checkForUpdates(): Promise<void> {
       
       // Compare versions to determine if update is needed
       updateAvailable.value = gameVersion.value !== latestVersion.value
+      
+      if (updateAvailable.value) {
+        logStore.addLog('info', 'Update available', `New version ${latestVersion.value} is available`)
+        notify({
+          type: 'info',
+          title: 'Update Available',
+          text: `New version ${latestVersion.value} is available`
+        })
+      }
     }
   } catch (error) {
     console.error('Error checking for updates:', error)
     errorMessage.value = 'Failed to check for updates'
+    logStore.addLog('error', 'Failed to check for updates', error instanceof Error ? error.message : String(error))
+    notify({
+      type: 'error',
+      title: 'Error',
+      text: 'Failed to check for updates'
+    })
   } finally {
     isCheckingUpdate.value = false
   }
@@ -104,12 +129,31 @@ async function downloadUpdate(): Promise<void> {
       // Update the local version after successful download
       gameVersion.value = latestVersion.value
       updateAvailable.value = false
+      
+      logStore.addLog('success', 'Update downloaded successfully', `Updated to version ${latestVersion.value}`)
+      notify({
+        type: 'success',
+        title: 'Success',
+        text: 'Update downloaded successfully'
+      })
     } else {
       errorMessage.value = result?.error || 'Failed to download update'
+      logStore.addLog('error', 'Failed to download update', result?.error)
+      notify({
+        type: 'error',
+        title: 'Error',
+        text: 'Failed to download update'
+      })
     }
   } catch (error) {
     console.error('Error downloading update:', error)
     errorMessage.value = 'Error occurred while downloading update'
+    logStore.addLog('error', 'Error downloading update', error instanceof Error ? error.message : String(error))
+    notify({
+      type: 'error',
+      title: 'Error',
+      text: 'Error occurred while downloading update'
+    })
   } finally {
     clearInterval(progressInterval)
     isDownloading.value = false
@@ -131,10 +175,29 @@ async function launchGame(): Promise<void> {
     
     if (!result || !result.success) {
       errorMessage.value = result?.error || 'Failed to launch game'
+      logStore.addLog('error', 'Failed to launch game', result?.error)
+      notify({
+        type: 'error',
+        title: 'Error',
+        text: 'Failed to launch game'
+      })
+    } else {
+      logStore.addLog('success', 'Game launched successfully')
+      notify({
+        type: 'success',
+        title: 'Success',
+        text: 'Game launched successfully'
+      })
     }
   } catch (error) {
     console.error('Error launching game:', error)
     errorMessage.value = 'Error occurred while launching game'
+    logStore.addLog('error', 'Error launching game', error instanceof Error ? error.message : String(error))
+    notify({
+      type: 'error',
+      title: 'Error',
+      text: 'Error occurred while launching game'
+    })
   } finally {
     isLaunching.value = false
   }
@@ -152,6 +215,12 @@ async function loadNewsItems(): Promise<void> {
     }))
   } catch (error) {
     console.error('Error loading news:', error)
+    logStore.addLog('error', 'Failed to load news items', error instanceof Error ? error.message : String(error))
+    notify({
+      type: 'error',
+      title: 'Error',
+      text: 'Failed to load news items'
+    })
   } finally {
     isLoadingNews.value = false
   }
@@ -293,6 +362,7 @@ function formatDate(dateString: string): string {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  width: 100vw;
 }
 
 .layout-wrapper {

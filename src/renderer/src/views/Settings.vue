@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAppStore } from '../stores/appStore'
+import { useLogStore } from '../stores/logStore'
+import { useNotification } from '@kyvg/vue3-notification'
 
 const router = useRouter()
-const gameDirectory = ref('')
+const appStore = useAppStore()
+const logStore = useLogStore()
+const { notify } = useNotification()
+
 const isSaving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
 onMounted(async () => {
-  // Load current game directory
-  gameDirectory.value = await window.api.getGameDirectory()
+  // Load current game directory from store
+  await appStore.initializeApp()
 })
 
 async function selectDirectory(): Promise<void> {
@@ -20,7 +26,7 @@ async function selectDirectory(): Promise<void> {
   if (result.canceled) return
   
   if (result.filePaths && result.filePaths.length > 0) {
-    gameDirectory.value = result.filePaths[0]
+    appStore.gameDirectory = result.filePaths[0]
   }
 }
 
@@ -30,19 +36,37 @@ async function saveSettings(): Promise<void> {
   successMessage.value = ''
   
   try {
-    const success = await window.api.setGameDirectory(gameDirectory.value)
+    const success = await appStore.setGameDirectory(appStore.gameDirectory)
     
     if (success) {
       successMessage.value = 'Settings saved successfully'
+      logStore.addLog('success', 'Settings saved successfully')
+      notify({
+        type: 'success',
+        title: 'Success',
+        text: 'Settings saved successfully'
+      })
       // Navigate back to home after saving
       setTimeout(() => {
         router.push('/')
       }, 1500)
     } else {
       errorMessage.value = 'Failed to save settings'
+      logStore.addLog('error', 'Failed to save settings')
+      notify({
+        type: 'error',
+        title: 'Error',
+        text: 'Failed to save settings'
+      })
     }
   } catch (error) {
     errorMessage.value = 'An error occurred while saving settings'
+    logStore.addLog('error', 'Error saving settings', error instanceof Error ? error.message : String(error))
+    notify({
+      type: 'error',
+      title: 'Error',
+      text: 'An error occurred while saving settings'
+    })
     console.error(error)
   } finally {
     isSaving.value = false
@@ -52,51 +76,63 @@ async function saveSettings(): Promise<void> {
 
 <template>
   <div class="settings-container">
-    <section class="settings-section">
-      <h2>Settings</h2>
-      
-      <div v-if="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
-      
-      <div v-if="successMessage" class="success-message">
-        {{ successMessage }}
-      </div>
-      
-      <div class="settings-form">
-        <div class="form-group">
-          <label for="gameDirectory">Game Directory</label>
-          <div class="directory-input">
-            <input 
-              id="gameDirectory"
-              type="text"
-              v-model="gameDirectory"
-              placeholder="Select game directory"
-              readonly
-            />
-            <button @click="selectDirectory" class="browse-button">Browse</button>
-          </div>
-          <p class="help-text">Select the folder where your game is installed</p>
+    <div class="settings-content">
+      <section class="settings-section">
+        <h2>Settings</h2>
+        
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
         </div>
         
-        <button 
-          @click="saveSettings" 
-          class="save-button"
-          :disabled="isSaving || !gameDirectory"
-        >
-          <span v-if="isSaving" class="spinner-small"></span>
-          {{ isSaving ? 'Saving...' : 'Save Settings' }}
-        </button>
-      </div>
-    </section>
+        <div v-if="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
+        
+        <div class="settings-form">
+          <div class="form-group">
+            <label for="gameDirectory">Game Directory</label>
+            <div class="directory-input">
+              <input 
+                id="gameDirectory"
+                type="text"
+                v-model="appStore.gameDirectory"
+                placeholder="Select game directory"
+                readonly
+              />
+              <button @click="selectDirectory" class="browse-button">Browse</button>
+            </div>
+            <p class="help-text">Select the folder where your game is installed</p>
+          </div>
+          
+          <button 
+            @click="saveSettings" 
+            class="save-button"
+            :disabled="isSaving || !appStore.gameDirectory"
+          >
+            <span v-if="isSaving" class="spinner-small"></span>
+            {{ isSaving ? 'Saving...' : 'Save Settings' }}
+          </button>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .settings-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  padding: 1rem;
+  overflow-y: auto;
+  width: 100vw;
+}
+
+.settings-content {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .settings-section {
@@ -194,7 +230,7 @@ input:focus {
   margin: 0 auto;
 }
 
-.save-button:hover {
+.save-button:hover:not(:disabled) {
   background-color: #45a049;
   transform: translateY(-2px);
 }

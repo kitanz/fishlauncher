@@ -38,10 +38,12 @@ function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 1024,
     height: 768,
-    resizable: false,
-    show: true,
+    resizable: true,
+    show: false,
     frame: false,
     autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    backgroundColor: '#1a1a1a',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),

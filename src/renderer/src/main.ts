@@ -2,6 +2,8 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { createPinia } from 'pinia'
+import Notifications from '@kyvg/vue3-notification'
 import App from './App.vue'
 import Home from './views/Home.vue'
 import Settings from './views/Settings.vue'
@@ -16,6 +18,10 @@ const router = createRouter({
   routes
 })
 
-createApp(App)
-  .use(router)
-  .mount('#app')
+const app = createApp(App)
+
+app.use(createPinia())
+app.use(router)
+app.use(Notifications)
+
+app.mount('#app')
