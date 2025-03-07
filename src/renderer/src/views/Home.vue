@@ -2,23 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { useLogStore } from '../stores/logStore'
 import { useNotification } from '@kyvg/vue3-notification'
+import { UpdateInfo, NewsItem } from '../../types'
 
-// Define types locally since we can't import them
-interface UpdateInfo {
-  version: string
-  file: string
-  releaseDate?: string
-  releaseNotes?: string
-}
-
-interface NewsItem {
-  id: number | string
-  title: string
-  date: string
-  content: string
-  image?: string
-  imageLoaded?: boolean
-}
+// Types are now imported from central types.ts file
 
 const gameDirectory = ref('')
 const gameVersion = ref('')

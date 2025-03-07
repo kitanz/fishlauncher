@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: fishlauncher
+appId: com.kitanz.fishlauncher
+productName: Fish Launcher
 directories:
   buildResources: build
 files:
@@ -33,11 +33,11 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
-  category: Utility
+  maintainer: kitanz
+  category: Game
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://your-update-server.com/updates

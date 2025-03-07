@@ -13,11 +13,11 @@ export const useAppStore = defineStore('app', () => {
   const logStore = useLogStore()
 
   // State
-  const appName = ref('Fish Launcher')
-  const appVersion = ref('1.0.0')
-  const serverUrl = ref('http://localhost:3000')
-  const gameDirectory = ref('')
-  const enableAutoUpdates = ref(true)
+  const appName = ref<string>(import.meta.env.VITE_APP_NAME || '')
+  const appVersion = ref<string>(import.meta.env.VITE_APP_VERSION || '')
+  const serverUrl = ref<string>(import.meta.env.VITE_SERVER_URL || '')
+  const gameDirectory = ref<string>('')
+  const enableAutoUpdates = ref<boolean>(true)
 
   // Computed
   const isGameDirectorySet = computed(() => !!gameDirectory.value)
@@ -39,10 +39,10 @@ export const useAppStore = defineStore('app', () => {
   // Actions
   async function initializeApp(): Promise<boolean> {
     try {
-      const settings = await window.electron.ipcRenderer.invoke('get-app-settings')
+      const settings = await window.api.getAppSettings()
       if (settings) {
         gameDirectory.value = settings.gameDirectory || ''
-        enableAutoUpdates.value = settings.enableAutoUpdates ?? true
+        enableAutoUpdates.value = settings.enableAutoUpdates === true
       }
       
       showNotification('success', 'Success', 'App initialized successfully')
@@ -56,7 +56,7 @@ export const useAppStore = defineStore('app', () => {
 
   async function setGameDirectory(path: string): Promise<boolean> {
     try {
-      const success = await window.electron.ipcRenderer.invoke('set-game-directory', path)
+      const success = await window.api.setGameDirectory(path)
       if (success) {
         gameDirectory.value = path
       }

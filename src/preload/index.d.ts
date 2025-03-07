@@ -9,11 +9,19 @@ interface UpdateInfo {
 }
 
 interface NewsItem {
-  id: number
+  id: number | string
   title: string
   date: string
   content: string
   image?: string
+}
+
+interface AppSettings {
+  appName: string
+  appVersion: string
+  serverUrl: string
+  enableAutoUpdates: boolean
+  gameDirectory: string
 }
 
 declare global {
@@ -26,6 +34,7 @@ declare global {
       getGameDirectory: () => Promise<string>
       setGameDirectory: (directory: string) => Promise<boolean>
       getNewsItems: () => Promise<NewsItem[]>
+      getAppSettings: () => Promise<AppSettings>
     }
   }
 }

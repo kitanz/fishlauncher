@@ -7,9 +7,10 @@ export interface UpdateInfo {
 }
 
 export interface NewsItem {
-  id: number
+  id: number | string
   title: string
   date: string
   content: string
   image?: string
+  imageLoaded?: boolean
 } 

@@ -18,8 +18,6 @@ onMounted(async () => {
       throw new Error('Failed to initialize app')
     }
     
-    // Log successful initialization
-    logStore.addLog('success', 'Application initialized successfully')
     
     // If game directory is not set, redirect to settings
     if (!appStore.isGameDirectorySet) {
@@ -93,9 +91,11 @@ function closeWindow(): void {
 }
 
 html, body {
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 body {
@@ -103,11 +103,11 @@ body {
   background-color: #121212;
   color: #f5f5f5;
   line-height: 1.6;
-  overflow: hidden;
 }
 
 #app {
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   background-color: #121212;
   display: flex;
   flex-direction: column;
@@ -121,6 +121,10 @@ body {
   color: #ffffff;
   font-family: Arial, sans-serif;
   border: 1px solid #333;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
 .titlebar {
@@ -273,7 +277,10 @@ main {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding-top: 2.5rem; /* Add space below titlebar */
+  padding-top: 0.5rem; /* Reduced padding */
+  position: relative;
+  height: calc(100% - 32px); /* Subtract titlebar height */
+  width: 100%;
 }
 
 footer {

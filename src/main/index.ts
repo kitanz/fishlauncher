@@ -10,7 +10,14 @@ import StreamZip from 'node-stream-zip'
 import * as dotenv from 'dotenv'
 
 // Load environment variables
-dotenv.config({ path: join(app.getAppPath(), '../../.env') })
+console.log('App path:', app.getAppPath())
+console.log('Loading .env from:', join(app.getAppPath(), '.env'))
+dotenv.config({ path: join(app.getAppPath(), '.env') })
+console.log('Loaded environment variables:', {
+  SERVER_URL: process.env.SERVER_URL,
+  APP_NAME: process.env.APP_NAME,
+  APP_VERSION: process.env.APP_VERSION
+})
 
 // Create a store for settings
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,10 +26,13 @@ let store: any
 // Initialize store asynchronously
 const initStore = async (): Promise<void> => {
   const { default: Store } = await import('electron-store')
+  const serverUrl = process.env.SERVER_URL || 'http://localhost/get-updates'
+  console.log('Initializing store with server URL:', serverUrl)
+  
   store = new Store({
     defaults: {
       gameDirectory: process.env.DEFAULT_GAME_DIRECTORY || '',
-      serverUrl: process.env.SERVER_URL || 'localhost/game-updates',
+      serverUrl,
       appName: process.env.APP_NAME || 'Fish Launcher',
       appVersion: process.env.APP_VERSION || '0.0.0',
       enableAutoUpdates: process.env.ENABLE_AUTO_UPDATES === 'true'
@@ -177,6 +187,7 @@ function setupIpcHandlers(): void {
     try {
       const gameDir = store.get('gameDirectory') as string
       const serverUrl = store.get('serverUrl') as string
+      console.log('Current server URL from store:', serverUrl)
       
       if (!gameDir) {
         return { needsUpdate: false, error: 'Game directory not set' }
@@ -186,9 +197,33 @@ function setupIpcHandlers(): void {
       let remoteVersion;
       try {
         // First try to fetch from server
-        const remoteVersionResponse = await axios.get(`${serverUrl}/version.json`)
+        const versionUrl = `${serverUrl}/version.json`
+        console.log('Attempting to fetch version from:', versionUrl)
+        const remoteVersionResponse = await axios.get(versionUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        })
+        console.log('Server response:', {
+          status: remoteVersionResponse.status,
+          headers: remoteVersionResponse.headers,
+          data: remoteVersionResponse.data
+        })
         remoteVersion = remoteVersionResponse.data
-      } catch {
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error('Server fetch error:', {
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            headers: error.response?.headers,
+            data: error.response?.data,
+            url: error.config?.url
+          })
+        } else {
+          console.error('Error fetching from server:', error)
+        }
         // If server fetch fails, use local version.json for testing
         console.log('Using local version.json for testing')
         try {
@@ -352,12 +387,37 @@ function setupIpcHandlers(): void {
   ipcMain.handle('get-news-items', async () => {
     try {
       const serverUrl = store.get('serverUrl') as string
+      console.log('Current server URL from store:', serverUrl)
       
       try {
         // First try to fetch from server
-        const newsResponse = await axios.get(`${serverUrl}/news.json`)
+        const newsUrl = `${serverUrl}/news.json`
+        console.log('Attempting to fetch news from:', newsUrl)
+        const newsResponse = await axios.get(newsUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        })
+        console.log('News server response:', {
+          status: newsResponse.status,
+          headers: newsResponse.headers,
+          data: newsResponse.data
+        })
         return newsResponse.data
-      } catch {
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error('News server fetch error:', {
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            headers: error.response?.headers,
+            data: error.response?.data,
+            url: error.config?.url
+          })
+        } else {
+          console.error('Error fetching from server:', error)
+        }
         // If server fetch fails, use local news.json for testing
         console.log('Using local news.json for testing')
         try {
@@ -383,7 +443,8 @@ function setupIpcHandlers(): void {
       appName: store.get('appName'),
       appVersion: store.get('appVersion'),
       serverUrl: store.get('serverUrl'),
-      enableAutoUpdates: store.get('enableAutoUpdates')
+      enableAutoUpdates: store.get('enableAutoUpdates'),
+      gameDirectory: store.get('gameDirectory')
     }
   })
 

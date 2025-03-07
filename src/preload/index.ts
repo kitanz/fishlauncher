@@ -22,6 +22,7 @@ interface AppSettings {
   appVersion: string
   serverUrl: string
   enableAutoUpdates: boolean
+  gameDirectory: string
 }
 
 // Custom APIs for renderer

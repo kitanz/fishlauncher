@@ -1,128 +1,130 @@
 # Fish Launcher
 
-A modern, sleek game launcher built with Electron, Vue, and TypeScript. Fish Launcher provides a seamless experience for managing game updates, news, and launching your favorite games.
-
-![Fish Launcher Icon](resources/icon.png)
+A modern game launcher and updater built with Electron, Vue, and TypeScript.
 
 ## Features
 
-- **Game Management**: Set your game directory
-- **Automatic Updates**: Check for and download game updates automatically
-- **News Feed**: Stay up-to-date with the latest game news and announcements
-- **Modern UI**: Clean, responsive interface
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+- Game version checking and automatic updates
+- News feed with images and content
+- Settings management
+- Logging system
+- Cross-platform support (Windows, macOS, Linux)
 
-## Installation
+## Development
 
 ### Prerequisites
 
-- Node.js 16.x or higher
-- npm 8.x or higher
+- Node.js 16+
+- npm or yarn
 
 ### Setup
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/fishlauncher.git
-   cd fishlauncher
-   ```
+```bash
+git clone https://github.com/kitanz/fishlauncher.git
+cd fishlauncher
+```
 
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-3. Create a `.env` file in the project root with the following variables:
-   ```
-   SERVER_URL=https://your-server-url.com/game-updates
-   APP_NAME=Fish Launcher
-   APP_VERSION=1.0.0
-   DEFAULT_GAME_DIRECTORY=
-   ENABLE_AUTO_UPDATES=true
-   ```
+3. Create a `.env` file in the root directory with the following content:
+```
+SERVER_URL=http://localhost/get-updates
+APP_NAME=Fish Launcher
+APP_VERSION=1.0.0
+```
 
-4. Create sample `version.json` and `news.json` files in the project root for testing:
-   
-   **version.json**:
-   ```json
-   {
-     "version": "1.0.0",
-     "file": "game-update.zip",
-     "notes": "Initial release"
-   }
-   ```
+### Development Commands
 
-   **news.json**:
-   ```json
-   [
-     {
-       "id": 1,
-       "title": "Welcome to Fish Launcher",
-       "date": "2023-06-01",
-       "content": "This is the first release of Fish Launcher. Enjoy!",
-       "image": "https://example.com/images/welcome.jpg"
-     }
-   ]
-   ```
-
-## Development
-
-Start the development server:
+- Start the development server:
 ```bash
 npm run dev
 ```
 
-## Building
-
-Build the application for production:
+- Build the application:
 ```bash
 npm run build
 ```
 
-The built application will be in the `dist` directory.
+- Build for specific platforms:
+```bash
+npm run build:win    # Windows
+npm run build:mac    # macOS
+npm run build:linux  # Linux
+```
 
 ## Project Structure
 
-- `src/main`: Electron main process code
-- `src/preload`: Preload scripts for secure IPC communication
-- `src/renderer`: Vue frontend application
-  - `src/renderer/src/views`: Vue components for different views
-  - `src/renderer/src/assets`: Static assets and styles
-  - `src/renderer/src/types`: TypeScript type definitions
+```
+fishlauncher/
+├── build/                # Build resources
+├── resources/            # Application resources
+├── src/
+│   ├── main/             # Electron main process
+│   │   ├── modules/      # Modular main process code
+│   │   └── index.ts      # Main entry point
+│   ├── preload/          # Preload scripts
+│   └── renderer/         # Frontend (Vue)
+│       ├── src/
+│       │   ├── assets/   # Static assets
+│       │   ├── components/# Vue components
+│       │   ├── stores/   # Pinia stores
+│       │   ├── utils/    # Utility functions
+│       │   ├── views/    # Vue views
+│       │   ├── App.vue   # Main Vue component
+│       │   └── main.ts   # Renderer entry point
+│       ├── index.html    # HTML template
+│       └── types.ts      # TypeScript types
+├── .env                  # Environment variables
+├── electron-builder.yml  # Electron builder config
+└── package.json          # Project metadata
+```
 
-## Configuration
+## Server Setup
 
-### Environment Variables
+The launcher expects a server with the following endpoints:
 
-- `SERVER_URL`: URL to the game update server
-- `APP_NAME`: Name of the launcher application
-- `APP_VERSION`: Version of the launcher application
-- `DEFAULT_GAME_DIRECTORY`: Default directory for game installation
-- `ENABLE_AUTO_UPDATES`: Enable or disable automatic updates
+- `{SERVER_URL}/version.json` - Contains the latest game version information
+- `{SERVER_URL}/news.json` - Contains news items
+- `{SERVER_URL}/{update-file}` - Update files referenced in version.json
 
-### Server API
+Example `version.json`:
+```json
+{
+  "version": "1.0.0",
+  "file": "updates/game-1.0.0.zip",
+  "releaseDate": "2023-01-01",
+  "releaseNotes": "Initial release"
+}
+```
 
-The launcher expects the following endpoints on your server:
-
-- `{SERVER_URL}/version.json`: Information about the latest game version
-- `{SERVER_URL}/news.json`: Array of news items to display
-- `{SERVER_URL}/{update-file}`: Game update files
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add some amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+Example `news.json`:
+```json
+[
+  {
+    "id": 1,
+    "title": "Welcome to Fish Launcher",
+    "date": "2023-01-01",
+    "content": "This is the first news item.",
+    "image": "http://example.com/images/news1.jpg"
+  }
+]
+```
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Credits
 
 - [Electron](https://www.electronjs.org/)
 - [Vue.js](https://vuejs.org/)
+- [Pinia](https://pinia.vuejs.org/)
 - [TypeScript](https://www.typescriptlang.org/)
-- [electron-vite](https://github.com/alex8088/electron-vite)
